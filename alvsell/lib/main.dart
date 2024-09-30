@@ -1,3 +1,4 @@
+import 'package:alvsell/Gadget.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -30,17 +31,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // Lista gadżetów
+  // Lista gadżetów z przypisanymi obrazkami
   List<Gadget> gadgets = [
-    Gadget(name: 'Magnes wejście', price: 10.0),
-    Gadget(name: 'Magnes kopuły pionowy', price: 10.0),
-    Gadget(name: 'Magnes kopuły poziomy', price: 10.0),
-    Gadget(name: 'Długopis', price: 8.0),
-    Gadget(name: 'Butelka Jasna', price: 25.0),
-    Gadget(name: 'Butelka Ciemna', price: 25.0),
-    Gadget(name: 'Smycz', price: 6.0),
-    Gadget(name: 'Zdjęcie', price: 20.0),
-  ];
+  Gadget(name: 'Magnes wejście', price: 10.0, imagePath: 'assets/gadzety/Magnes wejście.png'),
+  Gadget(name: 'Magnes kopuły pionowy', price: 10.0, imagePath: 'assets/gadzety/Magnes kopuły pionowy.png'),
+  Gadget(name: 'Magnes kopuły poziomy', price: 10.0, imagePath: 'assets/gadzety/Magnes kopuły poziomy.png'),
+  Gadget(name: 'Długopis', price: 8.0, imagePath: 'assets/gadzety/Długopis.png'),
+  Gadget(name: 'Butelka Czarna', price: 25.0, imagePath: 'assets/gadzety/Butelka Czarna.png'),
+  Gadget(name: 'Butelka pomarańczowa', price: 25.0, imagePath: 'assets/gadzety/Butelka pomarańczowa.png'),
+  Gadget(name: 'Smycz', price: 6.0, imagePath: 'assets/gadzety/Smycz.png'),
+  Gadget(name: 'Zdjęcie', price: 20.0, imagePath: 'assets/gadzety/Zdjęcie.png'),
+];
+
 
   // Zliczanie całkowitego dochodu
   double get totalRevenueCash {
@@ -84,79 +86,172 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: Column(
         children: [
-          // Lista przycisków reprezentujących gadżety
+          // Lista przycisków reprezentujących gadżety w dwóch kolumnach
           Expanded(
-  child: ListView.builder(
-    itemCount: gadgets.length,
-    itemBuilder: (context, index) {
-      final gadget = gadgets[index];
-      return ListTile(
-        title: Text('${gadget.name} - Cena: ${gadget.price} PLN'),
-        subtitle: Text('Sprzedano:\n ${gadget.soldCash} za gotówkę\n ${gadget.soldCard} za kartę'),
-        trailing: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Pierwszy rząd: Sprzedaż za gotówkę i kartę
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                  onPressed: () => sellGadgetCash(gadget),
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Zmniejszenie wysokości
-                    minimumSize: Size(80, 25), // Minimalna wysokość przycisków
-                  ),
-                  child: Text('Sprzedaj 1 za gotówkę'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => sellGadgetCard(gadget),
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Zmniejszenie wysokości
-                    minimumSize: Size(80, 25), // Minimalna wysokość przycisków
-                  ),
-                  child: Text('Sprzedaj 1 za kartę'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Drugi rząd: Cofnij sprzedaż za gotówkę i kartę
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                  onPressed: () => undoSellGadgetCash(gadget),
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Zmniejszenie wysokości
-                    minimumSize: Size(80, 25), // Minimalna wysokość przycisków
-                  ),
-                  child: Text('Cofnij 1 za gotówkę'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => undoSellGadgetCard(gadget),
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Zmniejszenie wysokości
-                    minimumSize: Size(80, 25), // Minimalna wysokość przycisków
-                  ),
-                  child: Text('Cofnij 1 za kartę'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    },
+            child: GridView.builder(
+              padding: const EdgeInsets.all(8.0),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Dwie kolumny
+                crossAxisSpacing: 8.0, // Odstęp poziomy między kolumnami
+                mainAxisSpacing: 8.0, // Odstęp pionowy między wierszami
+                childAspectRatio: 3,  // Kontrolowanie proporcji (szerokość/wysokość)
+              ),
+              itemCount: gadgets.length,
+              itemBuilder: (context, index) {
+                final gadget = gadgets[index];
+                return Container(
+  width: 150,  // Szerokość kafelka
+  height: 200, // Wysokość kafelka
+  decoration: BoxDecoration(
+    color: const Color.fromARGB(170, 133, 133, 133),
+    borderRadius: BorderRadius.circular(10),
+    border: Border.all( // Dodanie czarnej ramki
+      color: Colors.black, // Czarny kolor ramki
+      width: 2.0, // Grubość ramki
+    ),
+    boxShadow: [
+      BoxShadow(
+        color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
+        spreadRadius: 5,
+        blurRadius: 10,
+        offset: Offset(0, 3), // Cień
+      ), 
+    ],
   ),
-),
+  child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Row(
+      children: [
+        // Dodanie obrazka po lewej stronie
+        Image.asset(
+          gadget.imagePath,
+          width: 150, // Szerokość obrazka
+          height: 150, // Wysokość obrazka
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Nazwa gadżetu
+              Text(
+                '${gadget.name}',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Cena: ${gadget.price} PLN',
+                style: TextStyle(fontSize: 12),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              // Sprzedaż za gotówkę i kartę - pierwszy rząd przycisków
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => sellGadgetCash(gadget),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      minimumSize: Size(60, 30), // Minimalna szerokość i wysokość przycisku
+                      fixedSize: Size(120, 40),  // Dokładna szerokość i wysokość przycisku
+                      backgroundColor: const Color.fromARGB(215, 76, 175, 79), // Kolor tła przycisku
+                      foregroundColor: Colors.white, // Kolor tekstu przycisku
+                      side: BorderSide(color: Colors.black, width: 2.0), // Czarna ramka o szerokości 2 piksele
+                    ),
+                    child: Text(
+                      'Gotówka',
+                      style: TextStyle(
+                        fontSize: 14, // Rozmiar tekstu
+                        color: Colors.white, // Kolor tekstu
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  ElevatedButton(
+                    onPressed: () => sellGadgetCard(gadget),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      minimumSize: Size(60, 30), // Minimalna szerokość i wysokość przycisku
+                      fixedSize: Size(120, 40),  // Dokładna szerokość i wysokość przycisku
+                      backgroundColor: const Color.fromARGB(207, 33, 149, 243), // Kolor tła przycisku
+                      foregroundColor: Colors.white, // Kolor tekstu przycisku
+                      side: BorderSide(color: Colors.black, width: 2.0), // Czarna ramka o szerokości 2 piksele
+                    ),
+                    child: Text(
+                      'Karta',
+                      style: TextStyle(
+                        fontSize: 14, // Rozmiar tekstu
+                        color: Colors.white, // Kolor tekstu
+                      ),
+                    ),
+                  ),
 
+                ],
+              ),
+              const SizedBox(height: 4),
+              // Cofnij sprzedaż - drugi rząd przycisków
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => undoSellGadgetCash(gadget),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      minimumSize: Size(60, 30), // Minimalna szerokość i wysokość przycisku
+                      fixedSize: Size(120, 20), // Dokładna szerokość i wysokość przycisku
+                      backgroundColor: Colors.red, // Kolor tła przycisku
+                      foregroundColor: Colors.white, // Kolor tekstu przycisku
+                    ),
+                    child: Text(
+                      'Cofnij Gotówka',
+                      style: TextStyle(
+                        fontSize: 14, // Rozmiar tekstu
+                        color: Colors.white, // Kolor tekstu
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  ElevatedButton(
+                    onPressed: () => undoSellGadgetCard(gadget),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      minimumSize: Size(60, 30), // Minimalna szerokość i wysokość przycisku
+                      fixedSize: Size(120, 20), // Dokładna szerokość i wysokość przycisku
+                      backgroundColor: const Color.fromARGB(206, 244, 67, 54), // Kolor tła przycisku
+                      foregroundColor: Colors.white, // Kolor tekstu przycisku
+                    ),
+                    child: Text(
+                      'Cofnij Karta',
+                      style: TextStyle(
+                        fontSize: 14, // Rozmiar tekstu
+                        color: Colors.white, // Kolor tekstu
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              // Informacja o sprzedaży
+              Text(
+                'Gotówka: ${gadget.soldCash}, Karta: ${gadget.soldCard}',
+                style: TextStyle(fontSize: 10),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+);
 
-
+              },
+            ),
+          ),
 
           // Sekcja podsumowania
           Padding(
@@ -182,37 +277,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-}
-
-// Model danych dla gadżetu
-class Gadget {
-  String name;
-  double price;
-  int soldCash = 0;
-  int soldCard = 0;
-
-  Gadget({required this.name, required this.price});
-
-  void sellCash() {
-    soldCash += 1;
-  }
-
-  void sellCard() {
-    soldCard += 1;
-  }
-
-  void undoSellCash() {
-    if (soldCash > 0) {
-      soldCash -= 1;
-    }
-  }
-
-  void undoSellCard() {
-    if (soldCard > 0) {
-      soldCard -= 1;
-    }
-  }
-
-  double get totalRevenueCash => soldCash * price;
-  double get totalRevenueCard => soldCard * price;
 }
