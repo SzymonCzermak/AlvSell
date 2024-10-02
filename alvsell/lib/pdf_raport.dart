@@ -1,8 +1,12 @@
 import 'package:pdf/widgets.dart' as pw;
-import 'dart:html' as html;
-import 'package:alvsell/Gadget.dart'; 
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:universal_html/html.dart' as platform_html; // Zamiast dart:html
+import 'dart:io' as io; // dla platform mobilnych
+import 'package:alvsell/Gadget.dart';
+import 'package:path_provider/path_provider.dart'; // Dla Android/iOS
+import 'package:open_file/open_file.dart'; // Dla Android/iOS
 
-// Funkcja generująca PDF i otwierająca go w nowej karcie
+// Funkcja generująca PDF i otwierająca go w odpowiedni sposób dla Web i Mobile
 Future<void> generateAndOpenPdf(List<Gadget> gadgets, String currentDate) async {
   final pdf = pw.Document();
 
@@ -74,16 +78,19 @@ Future<void> generateAndOpenPdf(List<Gadget> gadgets, String currentDate) async 
     ),
   );
 
-  // Konwersja dokumentu PDF do listy bajtów
   final bytes = await pdf.save();
 
-  // Tworzenie Blob z danych PDF
-  final blob = html.Blob([bytes], 'application/pdf');
-  
-  // Utwórz URL do Blob i otwórz go w nowej karcie
-  final url = html.Url.createObjectUrlFromBlob(blob);
-  html.window.open(url, '_blank');
-
-  // Opcjonalnie: Zwolnij URL Blob po zakończeniu
-  html.Url.revokeObjectUrl(url);
+  if (kIsWeb) {
+    // Dla przeglądarek webowych
+    final blob = platform_html.Blob([bytes], 'application/pdf');
+    final url = platform_html.Url.createObjectUrlFromBlob(blob);
+    platform_html.window.open(url, '_blank');
+    platform_html.Url.revokeObjectUrl(url);
+  } else {
+    // Dla urządzeń mobilnych (Android/iOS)
+    final directory = await getApplicationDocumentsDirectory();
+    final file = io.File('${directory.path}/report_$currentDate.pdf');
+    await file.writeAsBytes(bytes);
+    OpenFile.open(file.path);
+  }
 }
